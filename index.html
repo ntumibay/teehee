@@ -374,6 +374,46 @@
     font-style:italic;
   }
 
+  /* text-back button (appears after sealing) */
+  .text-back-row{
+    margin-top:18px;
+    text-align:center;
+    display:none;
+  }
+  .text-back-row.show{ display:block; animation: fadeIn 0.5s ease forwards; }
+  .text-back-btn{
+    font-family:'Kalam', cursive;
+    font-size:1rem;
+    font-weight:700;
+    padding:12px 30px;
+    border-radius:50px;
+    border:2px solid var(--rose-deep);
+    background:var(--paper);
+    color:var(--rose-deep);
+    cursor:pointer;
+    box-shadow:2px 3px 0 rgba(58,46,38,0.12);
+    transition:transform 0.15s ease, background 0.2s, color 0.2s;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .text-back-btn:hover{
+    transform:translateY(-2px) scale(1.03);
+    background:var(--rose-deep);
+    color:#fff;
+  }
+  .text-back-btn svg{ width:18px; height:18px; flex-shrink:0; }
+  .copied-toast{
+    margin-top:10px;
+    font-family:'Kalam', cursive;
+    font-size:0.85rem;
+    color:var(--sage);
+    opacity:0;
+    transition:opacity 0.3s ease;
+    min-height:1.2em;
+  }
+  .copied-toast.show{ opacity:1; }
+
   /* confirmation note */
   .confirm-note{
     margin-top:24px;
@@ -524,6 +564,16 @@
         </div>
 
         <div class="confirm-note" id="confirmNote"></div>
+
+        <div class="text-back-row" id="textBackRow">
+          <button class="text-back-btn" id="textBackBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            text him the news
+          </button>
+          <p class="copied-toast" id="copiedToast"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -743,6 +793,12 @@
   const sendBtn = document.getElementById('sendBtn');
   const sendHint = document.querySelector('.send-hint');
   const confirmNote = document.getElementById('confirmNote');
+  const textBackRow = document.getElementById('textBackRow');
+  const textBackBtn = document.getElementById('textBackBtn');
+  const copiedToast = document.getElementById('copiedToast');
+
+  // EDIT THIS: your phone number, digits only (used for the sms: link).
+  const MY_PHONE_NUMBER = "8455366178";
 
   function updateSendState(){
     const ready = selectedType && selectedDay;
@@ -757,6 +813,29 @@
     confirmNote.classList.add('show');
     sendBtn.textContent = "sealed with a heart ❤";
     sendBtn.disabled = true;
+
+    const message = `It's a date! ${selectedType} on ${monthNames[CAL_MONTH]} ${selectedDay} 🎉`;
+    textBackBtn.dataset.message = message;
+    textBackRow.classList.add('show');
+  });
+
+  textBackBtn.addEventListener('click', ()=>{
+    const message = textBackBtn.dataset.message || "It's a date! 🎉";
+    spawnHearts(textBackBtn, 6);
+
+    // Try to open the native texting app, pre-filled and pre-addressed.
+    // (iOS uses "&", most others use "?" — try the iOS-style first, it degrades gracefully.)
+    const smsLink = `sms:${MY_PHONE_NUMBER}&body=${encodeURIComponent(message)}`;
+    window.location.href = smsLink;
+
+    // Also copy to clipboard as a fallback, in case the sms: link doesn't
+    // do anything (desktop browsers, some Android setups, etc.)
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(message).then(()=>{
+        copiedToast.textContent = "copied to your clipboard too, just in case!";
+        copiedToast.classList.add('show');
+      }).catch(()=>{});
+    }
   });
 
   /* ---------------- MUSIC ---------------- */
