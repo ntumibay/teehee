@@ -1,0 +1,5 @@
+Put your music file here, named exactly: fly-love.mp3
+
+(See README.md in the project root for full instructions on
+sourcing the audio file legally — e.g. exporting it from a
+song you've purchased, or a royalty-free version.)
