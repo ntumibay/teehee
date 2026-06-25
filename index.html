@@ -781,8 +781,7 @@
   });
 
   const firstDate = new Date(CAL_YEAR, CAL_MONTH, 1);
-  let startOffset = firstDate.getDay(); // make Monday = 0
-  if (startOffset < 0) startOffset = 6;
+  let startOffset = firstDate.getDay(); 
   const daysInMonth = new Date(CAL_YEAR, CAL_MONTH + 1, 0).getDate();
 
   let selectedDay = null;
