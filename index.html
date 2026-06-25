@@ -640,22 +640,32 @@
     const rect = noBtn.getBoundingClientRect();
     makeSkid(rect.left + rect.width/2, rect.top + rect.height/2);
 
-    const margin = 16;
     const w = rect.width, h = rect.height;
-    const maxX = window.innerWidth - w - margin;
-    const maxY = window.innerHeight - h - margin;
 
-    // pick a spot far from the cursor
+    // Keep the button well inside the viewport — a generous margin that
+    // also covers the visual overshoot from the rotation transform, plus
+    // a safe buffer for mobile browser chrome (address bars, etc).
+    const margin = Math.max(24, w * 0.3);
+    const minX = margin;
+    const minY = margin;
+    const maxX = Math.max(minX, window.innerWidth - w - margin);
+    const maxY = Math.max(minY, window.innerHeight - h - margin);
+
+    // pick a spot far from the cursor, within that safe zone
     let nx, ny, attempts = 0;
     do {
-      nx = margin + Math.random() * Math.max(1, (maxX - margin));
-      ny = margin + Math.random() * Math.max(1, (maxY - margin));
+      nx = minX + Math.random() * (maxX - minX);
+      ny = minY + Math.random() * (maxY - minY);
       attempts++;
-    } while (Math.hypot(nx - clientX, ny - clientY) < 180 && attempts < 12);
+    } while (Math.hypot(nx - clientX, ny - clientY) < 150 && attempts < 12);
+
+    // defensive clamp, just in case
+    nx = Math.min(Math.max(nx, minX), maxX);
+    ny = Math.min(Math.max(ny, minY), maxY);
 
     noBtn.style.left = nx + 'px';
     noBtn.style.top = ny + 'px';
-    noBtn.style.transform = `rotate(${(Math.random()*16-8).toFixed(1)}deg)`;
+    noBtn.style.transform = `rotate(${(Math.random()*12-6).toFixed(1)}deg)`;
 
     noCaption.textContent = captions[captionIndex % captions.length];
     captionIndex++;
