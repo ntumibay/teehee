@@ -539,7 +539,7 @@
 
         <div class="section-label">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C26B6B" stroke-width="2"><path d="M12 21s-8-4.5-8-11a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.5-8 11-8 11z"/></svg>
-          what kind of date?
+          what kind of date? <span style="font-size:0.8em; opacity:0.7;">(pick as many as you want)</span>
         </div>
         <div class="type-grid" id="typeGrid">
           <!-- cards injected by JS -->
@@ -727,7 +727,7 @@
   ];
 
   const typeGrid = document.getElementById('typeGrid');
-  let selectedType = null;
+  let selectedTypes = []; // now supports multiple picks
 
   dateTypes.forEach(t=>{
     const card = document.createElement('div');
@@ -735,13 +735,23 @@
     card.dataset.id = t.id;
     card.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#3A2E26" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${t.svg}</svg><div>${t.label}</div>`;
     card.addEventListener('click', ()=>{
-      document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedType = t.label;
+      const isSelected = card.classList.toggle('selected');
+      if (isSelected){
+        selectedTypes.push(t.label);
+      } else {
+        selectedTypes = selectedTypes.filter(label => label !== t.label);
+      }
       updateSendState();
     });
     typeGrid.appendChild(card);
   });
+
+  function formatSelectedTypes(){
+    if (selectedTypes.length === 0) return '';
+    if (selectedTypes.length === 1) return selectedTypes[0];
+    if (selectedTypes.length === 2) return `${selectedTypes[0]} + ${selectedTypes[1]}`;
+    return `${selectedTypes.slice(0, -1).join(', ')} + ${selectedTypes[selectedTypes.length - 1]}`;
+  }
 
   /* ---------------- CALENDAR ---------------- */
   // EDIT THESE: which days of the displayed month you're free.
@@ -801,7 +811,7 @@
   const MY_PHONE_NUMBER = "8455366178";
 
   function updateSendState(){
-    const ready = selectedType && selectedDay;
+    const ready = selectedTypes.length > 0 && selectedDay;
     sendBtn.disabled = !ready;
     sendHint.style.visibility = ready ? 'hidden' : 'visible';
   }
@@ -809,12 +819,13 @@
   sendBtn.addEventListener('click', ()=>{
     if (sendBtn.disabled) return;
     spawnHearts(sendBtn, 16);
-    confirmNote.innerHTML = `it's a date! <strong>${selectedType}</strong> on <strong>${monthNames[CAL_MONTH]} ${selectedDay}</strong>. I'll be counting down the days. ❤`;
+    const typesText = formatSelectedTypes();
+    confirmNote.innerHTML = `it's a date! <strong>${typesText}</strong> on <strong>${monthNames[CAL_MONTH]} ${selectedDay}</strong>. I'll be counting down the days. ❤`;
     confirmNote.classList.add('show');
     sendBtn.textContent = "sealed with a heart ❤";
     sendBtn.disabled = true;
 
-    const message = `It's a date! ${selectedType} on ${monthNames[CAL_MONTH]} ${selectedDay} 🎉`;
+    const message = `It's a date! ${typesText} on ${monthNames[CAL_MONTH]} ${selectedDay} 🎉`;
     textBackBtn.dataset.message = message;
     textBackRow.classList.add('show');
   });
