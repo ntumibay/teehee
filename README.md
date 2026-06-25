@@ -1,5 +1,3 @@
-# for Angie 💌
-
 A hand-drawn, cream-paper love letter page with a runaway "No" button,
 a date-type picker, and a calendar for picking a day — built as one
 self-contained HTML file so it can run free on GitHub Pages.
