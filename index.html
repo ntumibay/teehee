@@ -828,12 +828,12 @@
     if (sendBtn.disabled) return;
     spawnHearts(sendBtn, 16);
     const typesText = formatSelectedTypes();
-    confirmNote.innerHTML = `it's a date! <strong>${typesText}</strong> on <strong>${monthNames[CAL_MONTH]} ${selectedDay}</strong>. I'll be counting down the days. ❤`;
+    confirmNote.innerHTML = `it's a date :) <strong>${typesText}</strong> on <strong>${monthNames[CAL_MONTH]} ${selectedDay}</strong>. I'll be counting down the days. ❤`;
     confirmNote.classList.add('show');
     sendBtn.textContent = "sealed with a heart ❤";
     sendBtn.disabled = true;
 
-    const message = `It's a date! ${typesText} on ${monthNames[CAL_MONTH]} ${selectedDay} 🎉`;
+    const message = `It's a date, ${typesText} on ${monthNames[CAL_MONTH]} ${selectedDay} 🎉`;
     textBackBtn.dataset.message = message;
     textBackRow.classList.add('show');
   });
