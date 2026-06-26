@@ -571,7 +571,7 @@
 
   <!-- ===== SCREEN 1: THE ASK ===== -->
   <div class="screen active fade-in" id="screen-ask">
-    <div class="letter">
+    <div class="letter" id="letterCard">
       <div class="edge-tear top"></div>
       <div class="edge-tear bottom"></div>
       <svg class="stamp" viewBox="0 0 64 64">
@@ -687,6 +687,7 @@
   const yesBtn = document.getElementById('yesBtn');
   const choiceRow = document.getElementById('choiceRow');
   const noCaption = document.getElementById('noCaption');
+  const letterCard = document.getElementById('letterCard');
 
   const captions = [
     "nice try.",
@@ -732,14 +733,18 @@
 
     const w = rect.width, h = rect.height;
 
-    // Keep the button well inside the viewport — a generous margin that
-    // also covers the visual overshoot from the rotation transform, plus
-    // a safe buffer for mobile browser chrome (address bars, etc).
-    const margin = Math.max(24, w * 0.3);
-    const minX = margin;
-    const minY = margin;
-    const maxX = Math.max(minX, window.innerWidth - w - margin);
-    const maxY = Math.max(minY, window.innerHeight - h - margin);
+    // ===== Confine the dodge zone to the letter card itself =====
+    // Re-measure the card every time (it can move/resize on scroll or
+    // viewport changes), then keep a margin inset from its edges so the
+    // button always stays fully visible on the paper, never peeking
+    // off the card or off the screen.
+    const cardRect = letterCard.getBoundingClientRect();
+    const margin = Math.max(14, w * 0.18);
+
+    const minX = cardRect.left + margin;
+    const minY = cardRect.top + margin;
+    const maxX = Math.max(minX, cardRect.right - w - margin);
+    const maxY = Math.max(minY, cardRect.bottom - h - margin);
 
     // pick a spot far from the cursor, within that safe zone
     let nx, ny, attempts = 0;
@@ -747,7 +752,7 @@
       nx = minX + Math.random() * (maxX - minX);
       ny = minY + Math.random() * (maxY - minY);
       attempts++;
-    } while (Math.hypot(nx - clientX, ny - clientY) < 150 && attempts < 12);
+    } while (Math.hypot(nx - clientX, ny - clientY) < 90 && attempts < 12);
 
     // defensive clamp, just in case
     nx = Math.min(Math.max(nx, minX), maxX);
